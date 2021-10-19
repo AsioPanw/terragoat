@@ -11,11 +11,6 @@ resource "aws_s3_bucket" "data" {
     Name        = "${local.resource_prefix.value}-data"
     Environment = local.resource_prefix.value
     }, {
-    git_commit           = "86ee7490138a1a510059c000e162f42814e75843"
-    git_file             = "terraform/aws/s3.tf"
-    git_last_modified_at = "2021-10-19 16:30:29"
-    git_last_modified_by = "91682683+asiosio@users.noreply.github.com"
-    git_modifiers        = "91682683+asiosio/nimrodkor"
     git_org              = "asiosio"
     git_repo             = "terragoat"
     yor_trace            = "0874007d-903a-4b4c-945f-c9c233e13243"
