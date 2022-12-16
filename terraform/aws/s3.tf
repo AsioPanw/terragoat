@@ -21,6 +21,12 @@ resource "aws_s3_bucket" "data" {
   })
 }
 
+resource "aws_s3_bucket" "new_bucket" {
+  bucket        = "${local.resource_prefix.value}-data"
+  acl           = "public-read"
+  force_destroy = true
+}
+
 resource "aws_s3_bucket_object" "data_object" {
   bucket = aws_s3_bucket.data.id
   key    = "customer-master.xlsx"
