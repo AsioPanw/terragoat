@@ -100,6 +100,29 @@ resource "aws_s3_bucket" "buckex" {
 
 }
 
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "buckex" {
+  bucket = aws_s3_bucket.buckex.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "buckex" {
+  bucket = aws_s3_bucket.buckex.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "AES256"
+    }
+  }
+}
+
 resource "aws_s3_bucket" "data_science" {
   # bucket is not encrypted
   bucket = "${local.resource_prefix.value}-data-science"
