@@ -27,8 +27,99 @@ resource "aws_s3_bucket" "armandbucket" {
   # bucket does not have access logs
   # bucket does not have versioning
   bucket        = "${local.resource_prefix.value}-data"
-  acl           = "public-read"
+  acl           = "private"
   force_destroy = true
+}
+
+
+resource "aws_s3_bucket" "armandbucket_log_bucket" {
+  bucket = "armandbucket-log-bucket"
+}
+
+resource "aws_s3_bucket_logging" "armandbucket" {
+  bucket = aws_s3_bucket.armandbucket.id
+
+  target_bucket = aws_s3_bucket.armandbucket_log_bucket.id
+  target_prefix = "log/"
+}
+
+
+resource "aws_s3_bucket_versioning" "armandbucket" {
+  bucket = aws_s3_bucket.armandbucket.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "armandbucket" {
+  bucket = aws_s3_bucket.armandbucket.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_versioning" "armandbucket" {
+  bucket = aws_s3_bucket.armandbucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket" "destination" {
+  bucket = aws_s3_bucket.armandbucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_iam_role" "replication" {
+  name = "aws-iam-role"
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "s3.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_s3_bucket_replication_configuration" "armandbucket" {
+  depends_on = [aws_s3_bucket_versioning.armandbucket]
+  role   = aws_iam_role.armandbucket.arn
+  bucket = aws_s3_bucket.armandbucket.id
+  rule {
+    id = "foobar"
+    status = "Enabled"
+    destination {
+      bucket        = aws_s3_bucket.destination.arn
+      storage_class = "STANDARD"
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "armandbucket" {
+  bucket = aws_s3_bucket.armandbucket.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "AES256"
+    }
+  }
 }
 
 resource "aws_s3_bucket_object" "data_object" {
