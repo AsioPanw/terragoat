@@ -73,6 +73,98 @@ resource "aws_s3_bucket" "demoeffect" {
 
 }
 
+
+resource "aws_s3_bucket" "demoeffect_log_bucket" {
+  bucket = "demoeffect-log-bucket"
+}
+
+resource "aws_s3_bucket_logging" "demoeffect" {
+  bucket = aws_s3_bucket.demoeffect.id
+
+  target_bucket = aws_s3_bucket.demoeffect_log_bucket.id
+  target_prefix = "log/"
+}
+
+
+
+resource "aws_s3_bucket_versioning" "demoeffect" {
+  bucket = aws_s3_bucket.demoeffect.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "demoeffect" {
+  bucket = aws_s3_bucket.demoeffect.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_versioning" "demoeffect" {
+  bucket = aws_s3_bucket.demoeffect.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket" "destination" {
+  bucket = aws_s3_bucket.demoeffect.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_iam_role" "replication" {
+  name = "aws-iam-role"
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "s3.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_s3_bucket_replication_configuration" "demoeffect" {
+  depends_on = [aws_s3_bucket_versioning.demoeffect]
+  role   = aws_iam_role.demoeffect.arn
+  bucket = aws_s3_bucket.demoeffect.id
+  rule {
+    id = "foobar"
+    status = "Enabled"
+    destination {
+      bucket        = aws_s3_bucket.destination.arn
+      storage_class = "STANDARD"
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "demoeffect" {
+  bucket = aws_s3_bucket.demoeffect.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "AES256"
+    }
+  }
+}
+
 resource "aws_s3_bucket" "operations" {
   # bucket is not encrypted
   # bucket does not have access logs
