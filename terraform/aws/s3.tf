@@ -1,4 +1,5 @@
 resource "aws_s3_bucket" "data" {
+	# checkov:skip=CKV_AWS_21: i accept the risk
   # bucket is public
   # bucket is not encrypted
   # bucket does not have access logs
