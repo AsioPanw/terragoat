@@ -5,7 +5,7 @@ provider "aws" {
 resource "aws_security_group" "ssh_traffic" {
   name        = "ssh_traffic"
   description = "Allow SSH inbound traffic"
-  vpc_id     = "vpc-0e3c5e2a6a4d7d6a5"
+  vpc_id      = "vpc-0e3c5e2a6a4d7d6a5"
   ingress {
     description = "SSH"
     from_port   = 22
@@ -22,12 +22,13 @@ resource "aws_security_group" "ssh_traffic" {
     git_org              = "asiosio"
     git_repo             = "terragoat"
     yor_trace            = "74bd91b5-edc5-4477-9e06-087ced60018b"
+    env                  = "production"
   }
 }
 
 resource "aws_instance" "web_server_instance" {
   ami             = data.aws_ami.ubuntu.id
-  subnet_id    = "subnet-045fa779639d7decf"
+  subnet_id       = "subnet-045fa779639d7decf"
   instance_type   = "t2.micro"
   security_groups = ["${aws_security_group.ssh_traffic.id}"]
   tags = {
@@ -40,6 +41,7 @@ resource "aws_instance" "web_server_instance" {
     git_org              = "asiosio"
     git_repo             = "terragoat"
     yor_trace            = "3c3b2da7-0062-4b3f-9248-91a24430b3db"
+    env                  = "production"
   }
 }
 
