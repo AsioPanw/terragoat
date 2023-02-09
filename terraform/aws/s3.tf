@@ -27,6 +27,28 @@ resource "aws_s3_bucket" "armandbucket" {
   force_destroy = true
 }
 
+
+resource "aws_s3_bucket" "armandbucket_log_bucket" {
+  bucket = "armandbucket-log-bucket"
+}
+
+resource "aws_s3_bucket_logging" "armandbucket" {
+  bucket = aws_s3_bucket.armandbucket.id
+
+  target_bucket = aws_s3_bucket.armandbucket_log_bucket.id
+  target_prefix = "log/"
+}
+
+
+
+resource "aws_s3_bucket_versioning" "armandbucket" {
+  bucket = aws_s3_bucket.armandbucket.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_object" "data_object" {
   bucket = aws_s3_bucket.data.id
   key    = "customer-master.xlsx"
