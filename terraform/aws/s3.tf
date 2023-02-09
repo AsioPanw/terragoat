@@ -23,7 +23,7 @@ resource "aws_s3_bucket" "data" {
 
 resource "aws_s3_bucket" "armandbucket" {
   bucket        = "${local.resource_prefix.value}-data"
-  acl           = "public-read"
+  acl           = "private"
   force_destroy = true
 }
 
