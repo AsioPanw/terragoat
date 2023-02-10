@@ -31,6 +31,19 @@ resource "aws_s3_bucket" "100223bucket" {
   force_destroy = true
 }
 
+
+resource "aws_s3_bucket" "100223bucket_log_bucket" {
+  bucket = "100223bucket-log-bucket"
+}
+
+resource "aws_s3_bucket_logging" "100223bucket" {
+  bucket = aws_s3_bucket.100223bucket.id
+
+  target_bucket = aws_s3_bucket.100223bucket_log_bucket.id
+  target_prefix = "log/"
+}
+
+
 resource "aws_s3_bucket_object" "data_object" {
   bucket = aws_s3_bucket.data.id
   key    = "customer-master.xlsx"
